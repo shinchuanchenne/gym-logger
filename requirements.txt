@@ -7,3 +7,5 @@ alembic
 pydantic-settings
 pwdlib[argon2]
 PyJWT
+pydantic[email]
+python-multipart
