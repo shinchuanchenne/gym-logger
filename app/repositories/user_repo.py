@@ -1,5 +1,5 @@
 from sqlmodel import Session, select
-from app.models.users import User
+from app.models import User
 
 def get_user_by_email(
         session: Session,
