@@ -1,11 +1,17 @@
 from pwdlib import PasswordHash
-from fastapi.security import OAuth2AuthorizationCodeBearer
+from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta, timezone
 import jwt
-from jwt.exceptions import InvalidTokenError
+
 from app.core.config import settings
+from fastapi import HTTPException, Depends, status
+from app.db.session import get_session
+from sqlmodel import Session
+from app.models import User
+from app.repositories import user_repo
 
 password_hash = PasswordHash.recommended()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
 def hash_password(plain_password: str) -> str:
     return password_hash.hash(plain_password)
@@ -27,4 +33,39 @@ def create_access_token(data: dict) -> str:
         settings.SECRET_KEY,
         algorithm=settings.ALGORITHM
     )
-    return  encoded_jwt
+    return encoded_jwt
+
+
+def decode_access_token(token: str) -> dict:
+    try:
+        payload = jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM]
+        )
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
+    
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+
+def get_current_user(
+        token: str = Depends(oauth2_scheme),
+        session: Session = Depends(get_session)
+) -> User:
+    payload = decode_access_token(token)
+    email = payload.get("sub")
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token payload"
+        )
+    user = user_repo.get_user_by_email(session, email)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found"
+        )
+    return user

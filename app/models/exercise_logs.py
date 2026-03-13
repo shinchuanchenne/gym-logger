@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from sqlmodel import SQLModel, Field, Relationship
 from datetime import datetime, UTC
 from typing import TYPE_CHECKING
@@ -19,4 +17,4 @@ class ExerciseLog(SQLModel, table=True):
     workout_id: int = Field(foreign_key="workouts.id")
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
-    workout: Workout = Relationship(back_populates="exercise_logs")
+    workout: "Workout" = Relationship(back_populates="exercise_logs")
