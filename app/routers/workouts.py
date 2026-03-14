@@ -10,7 +10,7 @@ from app.services import (
     delete_workout as service_delete_workout
 )
 from app.models import User
-from app.core import get_current_user
+from app.core.security import get_current_user
 
 router = APIRouter(prefix="/workouts", tags=["workouts"])
 

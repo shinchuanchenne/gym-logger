@@ -5,7 +5,7 @@ from app.repositories import (
     get_workouts_by_user_id as get_workouts_by_user_id_repo,
     create_workout as create_workout_repo,
     update_workout as update_workout_repo,
-    delete_workout as delete_workout_repo,
+    delete_workout as delete_workout_repo, 
 )
 from app.models import Workout, User
 
