@@ -1,8 +1,11 @@
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status, Depends, HTTPException
 from sqlmodel import Session
-from app.schemas import UserCreate, UserRead
+from app.schemas import UserCreate, UserRead, UserUpdate
 from app.db.session import get_session
-from app.services import create_user as service_create_user
+from app.services import (
+    create_user as service_create_user,
+    update_user as service_update_user,
+)
 from app.models import User
 from app.core.security import get_current_user
 
@@ -18,3 +21,14 @@ def create_user(
 @router.get("/me", response_model=UserRead)
 def read_me(current_user: User = Depends(get_current_user)):
     return current_user
+
+@router.put("/me", response_model=UserRead)
+def update_user(
+    payload: UserUpdate,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)
+):
+    user = service_update_user(session, payload, current_user.id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    return user
