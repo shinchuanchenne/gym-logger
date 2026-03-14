@@ -45,10 +45,7 @@ def update_workout(
     current_user: User = Depends(get_current_user)
 
 ):
-    workout = service_update_workout(session, payload, workout_id)
-    if not workout:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workout not found")
-    return workout
+    return service_update_workout(session, payload, workout_id, current_user)
 
 @router.delete("/{workout_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_workout(
@@ -56,7 +53,5 @@ def delete_workout(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user)
 ):
-    ok = service_delete_workout(session, workout_id)
-    if not ok:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workout not found.")
+    service_delete_workout(session, workout_id, current_user)
     return None

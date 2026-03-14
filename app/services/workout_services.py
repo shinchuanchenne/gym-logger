@@ -46,12 +46,28 @@ def update_workout(
         session: Session,
         payload: WorkoutUpdate,
         workout_id: int,
-) -> Workout | None:
-    updated_data = payload.model_dump(exclude_unset=True)
-    return update_workout_repo(session, workout_id, updated_data)
+        current_user: User
+) -> Workout:
+    data = payload.model_dump(exclude_unset=True)
+    # ensure get workout by id is true
+    db_data = get_workout_by_id_repo(session, workout_id)
+    # if not return 404
+    if not db_data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workout not found")
+    # ensure user have authorication to update
+    # if not return 403
+    if db_data.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You do not have permission to update this workout")
+    return update_workout_repo(session, workout_id, data)
 
 def delete_workout(
         session: Session,
         workout_id: int,
+        current_user: User
 ) -> bool:
+    db_data = get_workout_by_id_repo(session, workout_id)
+    if not db_data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workout not found")
+    if db_data.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You do not have permission to delete this workout")
     return delete_workout_repo(session, workout_id)
