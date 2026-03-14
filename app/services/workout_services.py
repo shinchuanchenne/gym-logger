@@ -8,6 +8,7 @@ from app.repositories import (
     delete_workout as delete_workout_repo, 
 )
 from app.models import Workout, User
+from fastapi import HTTPException, status
 
 def create_workout(
         session: Session,
@@ -30,8 +31,16 @@ def get_workouts_by_user_id(
 def get_workout_by_id(
         session: Session,
         workout_id: int,
-) -> Workout | None:
-    return get_workout_by_id_repo(session, workout_id)
+        current_user: User,
+) -> Workout:
+    
+    data = get_workout_by_id_repo(session, workout_id)
+    if not data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workout not found")
+    
+    if data.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You do not have permission to access this workout")
+    return data
 
 def update_workout(
         session: Session,

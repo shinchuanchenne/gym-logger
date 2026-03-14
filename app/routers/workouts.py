@@ -35,10 +35,7 @@ def get_workout_by_id(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user)
 ):
-    workout = service_get_workout_by_id(session, workout_id)
-    if not workout:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Workout not found")
-    return workout
+    return service_get_workout_by_id(session, workout_id, current_user)
 
 @router.put("/{workout_id}", response_model=WorkoutRead)
 def update_workout(
