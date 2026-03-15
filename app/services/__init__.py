@@ -1,3 +1,4 @@
 from .user_services import create_user, update_user
 from .auth_services import authenticate_user
 from .workout_services import create_workout, get_workout_by_id, get_workouts_by_user_id, update_workout, delete_workout
+from .exercise_log_services import check_workout_owner, create_exercise_log, get_exercise_log_by_id, get_exercise_logs_by_workout_id, update_exercise_log, delete_exercise_log
