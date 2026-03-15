@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Depends, HTTPException
+from fastapi import APIRouter, status, Depends, HTTPException, Query
 from sqlmodel import Session
 from app.schemas import WorkoutCreate, WorkoutRead, WorkoutUpdate, WorkoutDetailRead
 from app.db import get_session
@@ -11,6 +11,7 @@ from app.services import (
 )
 from app.models import User
 from app.core.security import get_current_user
+from datetime import date
 
 router = APIRouter(prefix="/workouts", tags=["workouts"])
 
@@ -24,10 +25,19 @@ def create_workout(
 
 @router.get("/", response_model=list[WorkoutRead])
 def get_workouts(
+    workout_date: date | None = None,
+    limit: int = Query(default=10, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user)
 ):
-    return service_get_workouts_by_user_id(session, current_user)
+    return service_get_workouts_by_user_id(
+        session,
+        current_user,
+        workout_date=workout_date,
+        limit=limit,
+        offset=offset,
+    )
 
 @router.get("/{workout_id}", response_model=WorkoutDetailRead)
 def get_workout_by_id(

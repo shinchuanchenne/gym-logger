@@ -9,6 +9,7 @@ from app.repositories import (
 )
 from app.models import Workout, User
 from fastapi import HTTPException, status
+from datetime import date
 
 def create_workout(
         session: Session,
@@ -24,9 +25,12 @@ def create_workout(
 def get_workouts_by_user_id(
         session: Session,
         current_user: User,
+        workout_date: date | None = None,
+        limit: int = 10,
+        offset: int = 0,
 ) -> list[Workout]:
     user_id = current_user.id
-    return get_workouts_by_user_id_repo(session, user_id)
+    return get_workouts_by_user_id_repo(session, user_id, workout_date=workout_date, limit=limit, offset=offset)
 
 def get_workout_by_id(
         session: Session,
