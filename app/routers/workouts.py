@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, Depends, HTTPException
 from sqlmodel import Session
-from app.schemas import WorkoutCreate, WorkoutRead, WorkoutUpdate
+from app.schemas import WorkoutCreate, WorkoutRead, WorkoutUpdate, WorkoutDetailRead
 from app.db import get_session
 from app.services import (
     create_workout as service_create_workout,
@@ -29,7 +29,7 @@ def get_workouts(
 ):
     return service_get_workouts_by_user_id(session, current_user)
 
-@router.get("/{workout_id}", response_model=WorkoutRead)
+@router.get("/{workout_id}", response_model=WorkoutDetailRead)
 def get_workout_by_id(
     workout_id: int,
     session: Session = Depends(get_session),
