@@ -25,6 +25,20 @@ def check_workout_owner(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You do not have permission to access this workout")
     return workout
 
+def check_exercise_owner(
+        session: Session,
+        exercise_log_id: int,
+        current_user: User,
+) -> ExerciseLog:
+    # grab this exercise_id's workout_id
+    exercise_log = get_exercise_log_by_id_repo(session, exercise_log_id)
+    if not exercise_log:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exercise log not found")
+    # workout_id
+    workout_id = exercise_log.workout_id
+    # grab this work_id's user_id
+    check_workout_owner(session, workout_id, current_user)
+    return exercise_log
 
 def create_exercise_log(
         session: Session,
@@ -49,6 +63,7 @@ def get_exercise_logs_by_workout_id(
 
 def get_exercise_log_by_id(
         session: Session,
+        workout_id: int,
         exercise_log_id: int,
         current_user: User
 ) -> ExerciseLog:
@@ -56,12 +71,23 @@ def get_exercise_log_by_id(
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exercise log not found")
     
-    check_workout_owner(session, data.workout_id, current_user)
+    # check exercise belongs to workout
+    # check workout belongs to user
+    check_exercise_owner(session, exercise_log_id, current_user)
+
+    if data.workout_id != workout_id:
+        raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Exercise log not found in this workout",
+    )
+    check_workout_owner(session, workout_id, current_user)
+
     return data
 
 def update_exercise_log(
         session: Session,
         payload: ExerciseLogUpdate,
+        workout_id: int,
         exercise_log_id: int,
         current_user: User
 ) -> ExerciseLog:
@@ -73,16 +99,31 @@ def update_exercise_log(
     if not db_data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exercise log not found")
     # check user has authorication to update, if not return 403
-    check_workout_owner(session, db_data.workout_id, current_user)
+    check_exercise_owner(session, exercise_log_id, current_user)
+    if db_data.workout_id != workout_id:
+        raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Exercise log not found in this workout",
+    )
+    check_workout_owner(session, workout_id, current_user)
+
     return update_exercise_log_repo(session, exercise_log_id, data)
 
 def delete_exercise_log(
         session: Session,
         exercise_log_id: int,
+        workout_id: int,
         current_user: User
 ) -> bool:
     db_data = get_exercise_log_by_id_repo(session, exercise_log_id)
     if not db_data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exercise log not found")
-    check_workout_owner(session, db_data.workout_id, current_user)
+    check_exercise_owner(session, exercise_log_id, current_user)
+    if db_data.workout_id != workout_id:
+        raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Exercise log not found in this workout",
+    )
+    check_workout_owner(session, workout_id, current_user)
+
     return delete_exercise_log_repo(session, exercise_log_id)

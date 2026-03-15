@@ -39,7 +39,7 @@ def get_exercise_log_by_id(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user)
 ):
-    return service_get_exercise_log_by_id(session, exercise_log_id, current_user)
+    return service_get_exercise_log_by_id(session,workout_id, exercise_log_id, current_user)
 
 @router.put("/workouts/{workout_id}/exercise-logs/{exercise_log_id}", response_model=ExerciseLogRead)
 def update_exercise_log(
@@ -49,7 +49,7 @@ def update_exercise_log(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user)
 ):
-    return service_update_exercise_log(session, payload, exercise_log_id, current_user)
+    return service_update_exercise_log(session, payload, workout_id, exercise_log_id, current_user)
 
 @router.delete("/workouts/{workout_id}/exercise-logs/{exercise_log_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_exercise_log(
@@ -58,5 +58,5 @@ def delete_exercise_log(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_user)
 ):
-    service_delete_exercise_log(session, exercise_log_id, current_user)
+    service_delete_exercise_log(session, exercise_log_id, workout_id, current_user)
     return None
