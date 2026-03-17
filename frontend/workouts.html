@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GymLogger Workouts</title>
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body>
+  <h1>GymLogger</h1>
+  <h2>My Workouts</h2>
+
+  <div class="link-row">
+    <button id="logout-button" type="button">Logout</button>
+  </div>
+
+  <div id="message"></div>
+
+  <section>
+    <h2>Create Workout</h2>
+    <form id="create-workout-form">
+      <label for="title">Title</label>
+      <input id="title" name="title" type="text" required />
+
+      <label for="workout_date">Workout Date</label>
+      <input id="workout_date" name="workout_date" type="date" required />
+
+      <label for="notes">Notes</label>
+      <textarea id="notes" name="notes" rows="4"></textarea>
+
+      <button type="submit">Create Workout</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>Workout List</h2>
+    <ul id="workout-list"></ul>
+  </section>
+
+  <script src="./js/api.js"></script>
+  <script src="./js/workouts.js"></script>
+</body>
+</html>
