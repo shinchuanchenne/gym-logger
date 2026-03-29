@@ -8,6 +8,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/gym_logger
+      TEST_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/gym_logger_test
+      SECRET_KEY: test-secret-key
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
