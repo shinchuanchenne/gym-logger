@@ -18,6 +18,9 @@ services:
       DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/gymlogger
     depends_on:
       - db
+    env_file:
+      - .env
+    
 
 volumes:
   postgres_data:
